@@ -49,7 +49,7 @@ class SWPBridgeExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testLoadWhenBaseUriIsRequiredAndCannotBeEmpty()
     {

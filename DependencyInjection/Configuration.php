@@ -35,7 +35,8 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('base_uri')
-                    ->defaultValue('http://localhost:5050')
+                    ->cannotBeEmpty()
+                    ->isRequired()
                 ->end()
                 ->variableNode('options')->end()
             ->end()
