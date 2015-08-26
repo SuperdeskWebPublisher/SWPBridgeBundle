@@ -13,7 +13,7 @@
     "require": {
         "php": ">=5.5",
         "guzzlehttp/guzzle": "^6.0",
-        "superdesk/contentapi-sdk-php": "dev-master"
+        "superdesk/contentapi-sdk-php": "1.0.*"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5@stable",
