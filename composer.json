@@ -19,9 +19,10 @@
         "phpunit/phpunit": "~4.5@stable",
         "phpunit/php-code-coverage": "@stable",
         "phpspec/phpspec": "~2.0",
-        "symfony/http-kernel": "2.8.x-dev",
-        "symfony/config": "2.8.x-dev",
-        "symfony/dependency-injection": "2.8.x-dev"
+        "symfony/framework-bundle": "2.8.x-dev",
+        "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
+        "doctrine/doctrine-bundle": "~1.4",
+        "symfony/browser-kit": "2.8.x-dev"
     },
     "autoload": {
         "psr-4": {

@@ -55,9 +55,9 @@ swp_bridge:
 Add the following parameter to your `parameters.yml` file.
 
 ```yaml
-# app/config/parameters.yml
-parameters:
-    swp_bridge.base_uri: 'http://example.com:5050' 
+# app/config/config.yml
+swp_bridge:
+    base_uri: 'http://example.com:5050' 
 ```
 
 Change the hostname to the one of your content api instance.
@@ -71,8 +71,8 @@ The example below shows how to add custom curl options.
 
 ```yaml
 # app/config/parameters.yml
-parameters:
-    swp_bridge.options:
+swp_bridge:
+    options:
         curl: # http://guzzle.readthedocs.org/en/latest/faq.html#how-can-i-add-custom-curl-options
             10203: # integer value of CURLOPT_RESOLVE
                  - "example.com:5050:localhost"  # This will resolve the host example.com to your localhost 

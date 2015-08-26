@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="./Tests/bootstrap.php" colors="true">
+<phpunit bootstrap="./Tests/app/autoload.php" colors="true">
+
+    <php>
+        <server name="KERNEL_DIR" value="Tests/app/" />
+    </php>
 
     <testsuites>
         <testsuite name="SWPBridgeBundle test suite">
