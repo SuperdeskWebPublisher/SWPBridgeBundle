@@ -105,7 +105,7 @@ class BridgeController extends Controller
             'options' => $this->container->getParameter('swp_bridge.options'),
         );
 
-        new GuzzleClient($bridgeConfig);
+        return new GuzzleClient($bridgeConfig);
     }
 
     /**
@@ -117,6 +117,6 @@ class BridgeController extends Controller
      */
     private function isValidEndpoint($endpoint)
     {
-        return (!in_array(sprintf('/%s', ltrim($endpointPath, '/')), ContentApiSdk::getAvailableEndpoints()));
+        return (!in_array(sprintf('/%s', ltrim($endpoint, '/')), ContentApiSdk::getAvailableEndpoints()));
     }
 }
