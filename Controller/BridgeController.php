@@ -38,7 +38,7 @@ class BridgeController extends Controller
      * @param string      $endpoint Endpoint of the api
      * @param string|null $objectId Identifier of object to retrieve
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, $endpoint, $objectId = null)
     {
