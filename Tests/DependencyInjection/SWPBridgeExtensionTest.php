@@ -51,6 +51,21 @@ class SWPBridgeExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
+    public function testLoadWhenHostIsRequiredAndCannotBeEmpty()
+    {
+        $container = $this->createContainer();
+        $loader = $this->createLoader();
+
+        $config = array(
+            'swp_bridge.api.host' => '',
+        );
+
+        $loader->load(array($config), $container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
     public function testLoadWhenClientIdIsRequiredAndCannotBeEmpty()
     {
         $container = $this->createContainer();
