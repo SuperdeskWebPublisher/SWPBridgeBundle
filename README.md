@@ -55,7 +55,7 @@ swp_bridge:
 Add the following parameters to your `parameters.yml` file.
 
 ```yaml
-# app/config/config.yml
+# app/config/parameters.yml
 swp_bridge:
     api:
         host: 'example.com'

@@ -113,8 +113,10 @@ class BridgeController extends Controller
             ->setClientId($this->container->getParameter('swp_bridge.auth.client_id'))
             ->setUsername($this->container->getParameter('swp_bridge.auth.username'))
             ->setPassword($this->container->getParameter('swp_bridge.auth.password'));
+
         $apiClient = new GuzzleApiClient(new GuzzleClient(), $authentication);
         $apiClient->setOptions($this->container->getParameter('swp_bridge.options'));
+
         return $apiClient;
     }
 
