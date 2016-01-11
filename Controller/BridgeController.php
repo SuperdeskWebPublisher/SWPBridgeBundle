@@ -19,8 +19,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use SWP\BridgeBundle\Client\GuzzleClient;
+use SWP\BridgeBundle\Client\GuzzleApiClient;
 use Superdesk\ContentApiSdk\ContentApiSdk;
-use Superdesk\ContentApiSdk\Client\ClientInterface;
+use Superdesk\ContentApiSdk\API\Authentication\OAuthPasswordAuthentication;
+use Superdesk\ContentApiSdk\Client\ApiClientInterface;
 use Superdesk\ContentApiSdk\Exception\ContentApiException;
 
 /**
@@ -44,8 +46,9 @@ class BridgeController extends Controller
     public function indexAction(Request $request, $endpoint, $objectId = null)
     {
         $data = array();
-        $client = $this->getClient();
-        $sdk = $this->getSDK($client);
+        $apiClient = $this->getClient();
+        $sdk = $this->getSDK($apiClient);
+
         $parameters = $request->query->all();
         $endpointPath = sprintf('/%s', $endpoint);
 
@@ -83,29 +86,36 @@ class BridgeController extends Controller
     /**
      * Get an instance of the sdk
      *
-     * @param  ClientInterface $client HTTP Client
+     * @param  ApiClientInterface $apiClient Api HTTP Client
      *
-     * @return \Superdesk\ContentApiSdk\ContentApiSdk
+     * @return ContentApiSdk
      */
-    private function getSDK(ClientInterface $client)
+    private function getSDK(ApiClientInterface $apiClient)
     {
-        return new ContentApiSdk($client);
+        return new ContentApiSdk(
+            $apiClient,
+            $this->container->getParameter('swp_bridge.api.host'),
+            $this->container->getParameter('swp_bridge.api.port'),
+            $this->container->getParameter('swp_bridge.api.protocol')
+        );
     }
 
     /**
      * Get an instance of the HTTP client. The returned class should implement
-     * the \Superdesk\ContentApiSdk\Client\ClientInterface interface.
+     * the \Superdesk\ContentApiSdk\Client\ApiClientInterface interface.
      *
-     * @return GuzzleClient
+     * @return GuzzleApiClient
      */
     private function getClient()
     {
-        $bridgeConfig = array(
-            'base_uri' => $this->container->getParameter('swp_bridge.base_uri'),
-            'options' => $this->container->getParameter('swp_bridge.options'),
-        );
-
-        return new GuzzleClient($bridgeConfig);
+        $authentication = new OAuthPasswordAuthentication(new GuzzleClient());
+        $authentication
+            ->setClientId($this->container->getParameter('swp_bridge.auth.client_id'))
+            ->setUsername($this->container->getParameter('swp_bridge.auth.username'))
+            ->setPassword($this->container->getParameter('swp_bridge.auth.password'));
+        $apiClient = new GuzzleApiClient(new GuzzleClient(), $authentication);
+        $apiClient->setOptions($this->container->getParameter('swp_bridge.options'));
+        return $apiClient;
     }
 
     /**
