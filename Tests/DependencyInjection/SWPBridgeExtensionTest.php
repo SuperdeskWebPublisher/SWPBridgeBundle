@@ -27,15 +27,14 @@ class SWPBridgeExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad()
     {
-        $curlOptions = array(
-            'curl' => array(
-                '10203' => 'example.com:5050:localhost',
-            ),
-        );
-
         $data = array(
-            'swp_bridge.base_uri' => 'http://example.com',
-            'swp_bridge.options' => $curlOptions,
+            'swp_bridge.api.host' => 'example.com',
+            'swp_bridge.api.port' => 8000,
+            'swp_bridge.api.protocol' => 'http',
+            'swp_bridge.auth.client_id' => 'my_client_id',
+            'swp_bridge.auth.username' => 'my_username',
+            'swp_bridge.auth.password' => 'my_password',
+            'swp_bridge.options' => array('curl' => 'dummy')
         );
 
         $container = $this->createContainer($data);
@@ -44,20 +43,51 @@ class SWPBridgeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $loader->load(array($config), $container);
 
-        $this->assertEquals('http://example.com', $container->getParameter('swp_bridge.base_uri'));
-        $this->assertEquals($curlOptions, $container->getParameter('swp_bridge.options'));
+        foreach ($data as $key => $value) {
+            $this->assertEquals($value, $container->getParameter($key));
+        }
     }
 
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
-    public function testLoadWhenBaseUriIsRequiredAndCannotBeEmpty()
+    public function testLoadWhenClientIdIsRequiredAndCannotBeEmpty()
     {
         $container = $this->createContainer();
         $loader = $this->createLoader();
 
         $config = array(
-            'swp_bridge.base_uri' => '',
+            'swp_bridge.auth.client_id' => '',
+        );
+
+        $loader->load(array($config), $container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testLoadWhenUsernameIsRequiredAndCannotBeEmpty()
+    {
+        $container = $this->createContainer();
+        $loader = $this->createLoader();
+
+        $config = array(
+            'swp_bridge.auth.username' => '',
+        );
+
+        $loader->load(array($config), $container);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testLoadWhenPasswordIsRequiredAndCannotBeEmpty()
+    {
+        $container = $this->createContainer();
+        $loader = $this->createLoader();
+
+        $config = array(
+            'swp_bridge.auth.password' => '',
         );
 
         $loader->load(array($config), $container);
@@ -71,11 +101,18 @@ class SWPBridgeExtensionTest extends \PHPUnit_Framework_TestCase
     protected function getConfig()
     {
         return array(
-            'base_uri' => 'http://example.com',
+            'api' => array(
+                'host' => 'example.com',
+                'port' => 8000,
+                'protocol' => 'http'
+            ),
+            'auth' => array(
+                'client_id' => 'my_client_id',
+                'username' => 'my_username',
+                'password' => 'my_password'
+            ),
             'options' => array(
-                'curl' => array(
-                    '10203' => 'example.com:5050:localhost',
-                ),
+                'curl' => 'dummy'
             )
         );
     }

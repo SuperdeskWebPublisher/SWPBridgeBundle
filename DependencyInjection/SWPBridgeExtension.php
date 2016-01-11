@@ -31,16 +31,37 @@ class SWPBridgeExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $defaultOptions = array();
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!empty($config['base_uri'])) {
-            $container->setParameter($this->getAlias().'.base_uri', $config['base_uri']);
+        if (isset($config['api'])) {
+            if (!empty($config['api']['host'])) {
+                $container->setParameter($this->getAlias().'.api.host', $config['api']['host']);
+            }
+            if (!empty($config['api']['port'])) {
+                $container->setParameter($this->getAlias().'.api.port', $config['api']['port']);
+            }
+            if (!empty($config['api']['protocol'])) {
+                $container->setParameter($this->getAlias().'.api.protocol', $config['api']['protocol']);
+            }
         }
-        if (!empty($config['options'])) {
-            $container->setParameter($this->getAlias().'.options', $config['options']);
-        } else {
-            $container->setParameter($this->getAlias().'.options', array());
+
+        if (isset($config['auth'])) {
+            if (!empty($config['auth']['client_id'])) {
+                $container->setParameter($this->getAlias().'.auth.client_id', $config['auth']['client_id']);
+            }
+            if (!empty($config['auth']['username'])) {
+                $container->setParameter($this->getAlias().'.auth.username', $config['auth']['username']);
+            }
+            if (!empty($config['auth']['password'])) {
+                $container->setParameter($this->getAlias().'.auth.password', $config['auth']['password']);
+            }
         }
+
+        if (isset($config['options']) && is_array($config['options'])) {
+            $defaultOptions = $config['options'];
+        }
+        $container->setParameter($this->getAlias().'.options', $defaultOptions);
     }
 }

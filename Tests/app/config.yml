@@ -4,4 +4,13 @@ framework:
     test: ~
 
 swp_bridge:
-    base_uri: 'http://example.com'
+    api:
+        host: 'example.com'
+        port: 8000
+        protocol: 'http'
+    auth:
+        client_id: 'my_client_id'
+        username: 'my_username'
+        password: 'my_password'
+    options:
+        curl: 'dummy'
