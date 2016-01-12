@@ -46,10 +46,10 @@ class GuzzleClient extends BaseClient implements ClientInterface
 
         try {
             $response = $this->request($method, $url, $options);
-        } catch(GuzzleClientException $e) {
+        } catch (GuzzleClientException $e) {
             // This is for 400 errors
             $response = $e->getResponse();
-        } catch(GuzzleServerException $e) {
+        } catch (GuzzleServerException $e) {
             // This is for 500 errors
             $response = $e->getResponse();
         } catch (GuzzleTransferException $e) {

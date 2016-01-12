@@ -37,31 +37,31 @@ class SWPBridgeExtension extends Extension
 
         if (isset($config['api'])) {
             if (!empty($config['api']['host'])) {
-                $container->setParameter($this->getAlias().'.api.host', $config['api']['host']);
+                $container->setParameter($this->getAlias() . '.api.host', $config['api']['host']);
             }
             if (!empty($config['api']['port'])) {
-                $container->setParameter($this->getAlias().'.api.port', $config['api']['port']);
+                $container->setParameter($this->getAlias() . '.api.port', $config['api']['port']);
             }
             if (!empty($config['api']['protocol'])) {
-                $container->setParameter($this->getAlias().'.api.protocol', $config['api']['protocol']);
+                $container->setParameter($this->getAlias() . '.api.protocol', $config['api']['protocol']);
             }
         }
 
         if (isset($config['auth'])) {
             if (!empty($config['auth']['client_id'])) {
-                $container->setParameter($this->getAlias().'.auth.client_id', $config['auth']['client_id']);
+                $container->setParameter($this->getAlias() . '.auth.client_id', $config['auth']['client_id']);
             }
             if (!empty($config['auth']['username'])) {
-                $container->setParameter($this->getAlias().'.auth.username', $config['auth']['username']);
+                $container->setParameter($this->getAlias() . '.auth.username', $config['auth']['username']);
             }
             if (!empty($config['auth']['password'])) {
-                $container->setParameter($this->getAlias().'.auth.password', $config['auth']['password']);
+                $container->setParameter($this->getAlias(). '.auth.password', $config['auth']['password']);
             }
         }
 
         if (isset($config['options']) && is_array($config['options'])) {
             $defaultOptions = $config['options'];
         }
-        $container->setParameter($this->getAlias().'.options', $defaultOptions);
+        $container->setParameter($this->getAlias() . '.options', $defaultOptions);
     }
 }
