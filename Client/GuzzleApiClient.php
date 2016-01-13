@@ -15,32 +15,14 @@
 namespace SWP\BridgeBundle\Client;
 
 use Superdesk\ContentApiSdk\API\Request\RequestInterface;
-use Superdesk\ContentApiSdk\API\Request\OAuthDecorator;
-use Superdesk\ContentApiSdk\API\Response;
-use Superdesk\ContentApiSdk\ContentApiSdk;
-use Superdesk\ContentApiSdk\Client\AbstractApiClient;
-use Superdesk\ContentApiSdk\Client\ClientInterface;
-use Superdesk\ContentApiSdk\Exception\AccessDeniedException;
-use Superdesk\ContentApiSdk\Exception\AuthenticationException;
-use Superdesk\ContentApiSdk\Exception\ClientException;
-use Superdesk\ContentApiSdk\Exception\ContentApiException;
-use Superdesk\ContentApiSdk\Exception\ResponseException;
+use Superdesk\ContentApiSdk\Client\DefaultApiClient;
 
 /**
  * Request service that implements all method regarding basic request/response
  * handling.
  */
-class GuzzleApiClient extends AbstractApiClient
+class GuzzleApiClient extends DefaultApiClient
 {
-    /**
-     * Default request headers.
-     *
-     * @var array
-     */
-    protected $headers = array(
-        'Accept' => 'application/json'
-    );
-
     /**
      * Options which come from Bundle configuration.
      *
@@ -51,73 +33,15 @@ class GuzzleApiClient extends AbstractApiClient
     /**
      * {@inheritdoc}
      */
-    public function makeApiCall(RequestInterface $request)
+    protected function sendRequest(RequestInterface $request)
     {
-        $response = null;
+        $request->setOptions(
+            $this->addDefaultOptions(
+                $request->getOptions()
+            )
+        );
 
-        if ($this->authenticator->getAccessToken() !== null) {
-            $authenticatedRequest = new OAuthDecorator($request);
-            $authenticatedRequest->setAccessToken($this->authenticator->getAccessToken());
-            $authenticatedRequest->addAuthentication();
-
-            $response = $this->client->makeCall(
-                $authenticatedRequest->getFullUrl(),
-                $this->addDefaultHeaders($authenticatedRequest->getHeaders()),
-                $this->addDefaultOptions($authenticatedRequest->getOptions())
-            );
-
-            if ($response['status'] == 200) {
-                $this->authenticationRetryLimit = 0;
-
-                try {
-                    return new Response($response['body'], $response['headers']);
-                } catch (ResponseException $e) {
-                    throw new ClientException($e->getMessage(), $e->getCode(), $e);
-                }
-            }
-        }
-
-        if ($response === null || $response['status'] == 401) {
-
-            $this->authenticationRetryLimit++;
-
-            if ($this->authenticationRetryLimit > self::MAX_RETRY_LIMIT) {
-                throw new AccessDeniedException('Authentication retry limit reached.');
-            }
-
-            try {
-                $this->authenticator->setBaseUrl($request->getBaseUrl());
-                $this->authenticator->getAuthenticationTokens();
-
-                // Reexecute event
-                return $this->makeApiCall($request);
-            } catch (AccessDeniedException $e) {
-                throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
-            } catch (AuthenticationException $e) {
-                throw new AccessDeniedException('Could not authenticate against API.', $e->getCode(), $e);
-            }
-        }
-
-        throw new ClientException(sprintf('The server returned an error with status %s.', $response['status']));
-    }
-
-    /**
-     * Adds default headers to the headers per request, only if the key
-     * cannot not be found in the headers per request.
-     *
-     * @param array $headers
-     *
-     * @return array
-     */
-    private function addDefaultHeaders($headers)
-    {
-        foreach ($this->headers as $key => $value) {
-            if (!isset($headers[$key])) {
-                $headers[$key] = $value;
-            }
-        }
-
-        return $headers;
+        return parent::sendRequest($request);
     }
 
     /**
@@ -127,7 +51,7 @@ class GuzzleApiClient extends AbstractApiClient
      *
      * @return array
      */
-    private function addDefaultOptions($options)
+    public function addDefaultOptions($options)
     {
         return array_merge($options, $this->options);
     }

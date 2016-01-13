@@ -52,10 +52,10 @@ swp_bridge:
 
 ### Step 4: Configure the SWPBridgeBundle
 
-Add the following parameters to your `parameters.yml` file.
+Add the following parameters to your `config.yml` file.
 
 ```yaml
-# app/config/parameters.yml
+# app/config/config.yml
 swp_bridge:
     api:
         host: 'example.com'
@@ -93,7 +93,7 @@ of options as a parameter in your configuration.
 The example below shows how to add custom curl options.
 
 ```yaml
-# app/config/parameters.yml
+# app/config/config.yml
 swp_bridge:
     options:
         curl: # http://guzzle.readthedocs.org/en/latest/faq.html#how-can-i-add-custom-curl-options

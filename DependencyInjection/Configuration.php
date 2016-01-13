@@ -37,7 +37,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('api')
                     ->children()
                         ->scalarNode('host')
-                            ->info('Hostname where the Content API.')
+                            ->info('Hostname of the Content API.')
                             ->isRequired()
                             ->cannotBeEmpty()
                         ->end()

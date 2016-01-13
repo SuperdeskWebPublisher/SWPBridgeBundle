@@ -15,10 +15,10 @@
 namespace spec\SWP\BridgeBundle\Client;
 
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Superdesk\ContentApiSdk\API\Request;
 use Superdesk\ContentApiSdk\API\Authentication\OAuthPasswordAuthentication;
 use Superdesk\ContentApiSdk\Client\ClientInterface;
-use Superdesk\ContentApiSdk\Exception\AccessDeniedException;
 
 class GuzzleApiClientSpec extends ObjectBehavior
 {
@@ -28,7 +28,6 @@ class GuzzleApiClientSpec extends ObjectBehavior
         Request $request
     ) {
         $this->beConstructedWith($client, $authentication);
-        $request->getOptions()->willReturn(array());
 
         $baseUrl = 'http://httpbin.org/';
         $fullUrl = sprintf('%s/%s', $baseUrl, 'status/200');
@@ -48,64 +47,30 @@ class GuzzleApiClientSpec extends ObjectBehavior
         $this->shouldImplement('\Superdesk\ContentApiSdk\Client\ApiClientInterface');
     }
 
-    function it_should_return_a_response($client, $authentication, $request)
+    function it_should_get_and_set_default_options()
     {
-        $authentication->getAccessToken()->shouldBeCalled();
+        $defaultOptions = array('some_option_key' => 'some_option_value');
+        $this->setOptions($defaultOptions)->getOptions()->shouldReturn($defaultOptions);
+    }
+
+    function it_should_add_default_options()
+    {
+        $defaultOptions = array('headers' => array('User-Agent' => 'guzzle_api_spec_test'));
+        $fakeRequestOptions = array('some_options' => 'some_value');
+        $this->setOptions($defaultOptions);
+        $this->addDefaultOptions($fakeRequestOptions)->shouldReturn(array_merge($fakeRequestOptions, $defaultOptions));
+    }
+
+    function it_should_add_default_options_when_making_a_call($client, $request)
+    {
+        $options = array('headers' => array('User-Agent' => 'guzzle_api_spec_test'));
+        $request->getOptions()->shouldBeCalled()->willReturn(array());
+        $request->setOptions(Argument::type('array'))->shouldBeCalled();
         $client->makeCall(
             $request->getWrappedObject()->getFullUrl(),
             $request->getWrappedObject()->getHeaders(),
             array()
         )->shouldBeCalled()->willReturn(array('headers' => array(), 'status' => 200, 'body' => '{"pubstatus": "usable", "_links": {"parent": {"href": "/", "title": "home"}, "collection": {"href": "items", "title": "items"}, "self": {"href": "items/tag:example.com,0001:newsml_BRE9A607", "title": "Item"}}, "body_text": "Andromeda and Milky Way will collide in about 2 billion years", "type": "text", "language": "en", "versioncreated": "2015-03-09T16:32:23+0000", "uri": "http://api.master.dev.superdesk.org/items/tag%3Aexample.com%2C0001%3Anewsml_BRE9A607", "version": "2", "headline": "Andromeda on a collision course"}'));
-        $this->makeApiCall($request)->shouldHaveType('\Superdesk\ContentApiSdk\API\Response');
-    }
-
-    function it_should_throw_an_exception_when_the_response_is_invalid($client, $authentication, $request)
-    {
-        $authentication->getAccessToken()->shouldBeCalled();
-        $client->makeCall(
-            $request->getWrappedObject()->getFullUrl(),
-            $request->getWrappedObject()->getHeaders(),
-            array()
-        )->shouldBeCalled()->willReturn(array('headers' => array(), 'status' => 200, 'body' => 'some invalid response body'));
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ClientException')->duringMakeApiCall($request);
-    }
-
-    function it_should_throw_an_exception_after_failing_several_times_to_get_an_access_token($authentication, $request)
-    {
-        $authentication->getAccessToken()->shouldBeCalled()->willReturn(null);
-        $authentication->getAuthenticationTokens()->shouldBeCalled()->willReturn(true);
-        $this->shouldThrow(new AccessDeniedException('Authentication retry limit reached.'))->duringMakeApiCall($request);
-    }
-
-    function it_should_get_a_new_access_token_when_access_token_is_set_but_a_401_is_returned($client, $authentication, $request)
-    {
-        $authentication->getAccessToken()->shouldBeCalled()->willReturn('some_access_token');
-        $authentication->getAuthenticationTokens()->shouldBeCalled()->willReturn(true);
-        $client->makeCall(
-            $request->getWrappedObject()->getFullUrl(),
-            $request->getWrappedObject()->getHeaders(),
-            array()
-        )->shouldBeCalled()->willReturn(array('status' => 401));
-
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\AccessDeniedException')->duringMakeApiCall($request);
-    }
-
-    function it_should_throw_an_when_an_non_200_status_is_returned($client, $authentication, $request)
-    {
-        $authentication->getAccessToken()->shouldBeCalled();
-
-        $client->makeCall(
-            $request->getWrappedObject()->getFullUrl(),
-            $request->getWrappedObject()->getHeaders(),
-            array()
-        )->willReturn(array('status' => 500));
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ClientException')->duringMakeApiCall($request);
-
-        $client->makeCall(
-            $request->getWrappedObject()->getFullUrl(),
-            $request->getWrappedObject()->getHeaders(),
-            array()
-        )->willReturn(array('status' => 403));
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ClientException')->duringMakeApiCall($request);
+        $this->makeApiCall($request);
     }
 }
