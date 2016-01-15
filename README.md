@@ -52,17 +52,40 @@ swp_bridge:
 
 ### Step 4: Configure the SWPBridgeBundle
 
-Add the following parameter to your `parameters.yml` file.
+Add the following parameters to your `config.yml` file.
 
 ```yaml
 # app/config/config.yml
 swp_bridge:
-    base_uri: 'http://example.com:5050' 
+    api:
+        host: 'example.com'
+    auth:
+        client_id: 'my_client_id'
+        username: 'my_username'
+        password: 'my_password'
 ```
 
-Change the hostname to the one of your content api instance.
+This is a minimum requirement to get started, see the section 
+[Everything about configuration](#everything-about-configuration) for more details.
 
-#### Adding custom http client options:
+## Everything about configuration
+
+### Configuration reference
+
+```yaml
+swp_bridge:
+    api:
+        host: 'The hostname of your Content API instance. This option is required.'
+        port: 'The port of your Content API Instance, defaults to 80.'
+        protocol: 'Protocol to use to connect to your Content API Instance, options are: _http_ and _https_. Defaults to _http_.'
+    auth:
+        client_id: 'Client ID for authenticating with your Content API Instance. This option is required.'
+        username: 'Username for authenticating with your Content API Instance. This option is required.'
+        password: 'Password for authenticating with your Content API Instance. This option is required.'
+    options: 'An array of options which will included in each call in GuzzleApiClient->makeApiCall(). The values defined here will override values from the Request object if the keys are identical.'
+```
+
+### Adding custom http client options:
 
 SWPBridgeBundle uses Guzzle to fetch data from the external server. You can add
 custom Guzzle options / headers for your http client by simply adding an array
@@ -70,7 +93,7 @@ of options as a parameter in your configuration.
 The example below shows how to add custom curl options.
 
 ```yaml
-# app/config/parameters.yml
+# app/config/config.yml
 swp_bridge:
     options:
         curl: # http://guzzle.readthedocs.org/en/latest/faq.html#how-can-i-add-custom-curl-options
@@ -82,7 +105,7 @@ For more details see [Guzzle documentation](http://guzzle.readthedocs.org/en/lat
 
 At this stage, the bundle is ready to be used by your application.
 
-##### Development Configuration
+#### Development Configuration
 
 The above example is specific for the Guzzle client and allows you to do custom
 hostname resolving, practical when using docker in your devevelopment environment.

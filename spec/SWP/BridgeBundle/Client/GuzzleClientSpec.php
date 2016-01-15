@@ -20,81 +20,56 @@ class GuzzleClientSpec extends ObjectBehavior
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType('SWP\BridgeBundle\Client\GuzzleClient');
-        $this->shouldImplement('Superdesk\ContentApiSdk\Client\ClientInterface');
+        $this->shouldHaveType('\SWP\BridgeBundle\Client\GuzzleClient');
+        $this->shouldImplement('\Superdesk\ContentApiSdk\Client\ClientInterface');
     }
 
-    function let()
+    function its_method_make_call_should_make_a_generic_http_request()
     {
-        $config = array('base_uri' => 'http://httpbin.org');
-        $this->beConstructedWith($config);
+        $response = $this->makeCall('http://httpbin.org/status/200', array());
+        $response->shouldHaveKey('headers');
+        $response->shouldHaveKeyWithValue('status', 200);
+        $response->shouldHaveKeyWithValue('body', '');
     }
 
-    function it_should_make_a_call_to_a_remote_server()
+    function its_method_make_call_should_set_correct_status_codes()
     {
-        $this->makeApiCall('/status/200', null, null)->shouldBe('');
+        $this->makeCall('http://httpbin.org/status/404')->shouldHaveKeyWithValue('status', 404);
+        $this->makeCall('http://httpbin.org/status/500')->shouldHaveKeyWithValue('status', 500);
+    }
+
+    function its_method_make_call_should_send_headers()
+    {
+        $headers = array(
+            'Authorization: some authorization token',
+            'X-Custom-Header: Blaat blaat'
+        );
+        $response = $this->makeCall('http://httpbin.org/headers', $headers);
+        $response->shouldHaveKey('body');
+
+        foreach ($headers as $header) {
+            list($key, $value) = explode(': ', $header);
+            $response['body']->shouldMatch(sprintf('/%s/i', $key));
+            $response['body']->shouldMatch(sprintf('/%s/i', $value));
+        }
+    }
+
+    function its_method_make_call_should_support_post_requests()
+    {
+        $postData = 'some random post data';
+        $response = $this->makeCall(
+            'http://httpbin.org/post',
+            array(),
+            array(),
+            'POST',
+            $postData
+        );
+        $response->shouldHaveKey('body');
+        $response['body']->shouldMatch(sprintf('/%s/i', $postData));
     }
 
     function it_should_throw_an_exception_when_an_error_occurs()
     {
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ContentApiException')->duringMakeApiCall('/status/404', null, null);
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ContentApiException')->duringMakeApiCall('/status/500', null, null);
-    }
-
-    function it_should_throw_an_exception_on_invalid_baseuri()
-    {
-        $config = array('base_uri' => '');
-        $this->beConstructedWith($config);
-        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ContentApiException')->duringMakeApiCall('', null, null);
-    }
-
-    function it_should_be_able_to_return_a_response_as_a_string()
-    {
-        $this->makeApiCall('/headers', null, null, false)->shouldBeString();
-    }
-
-    function it_should_be_able_to_return_a_response_as_valid_array_format()
-    {
-        $response = $this->makeApiCall('/headers', null, null, true);
-        $response->shouldBeArray();
-        $response->shouldHaveKey('headers');
-        $response->shouldHaveKey('status');
-        $response->shouldHaveKey('reason');
-        $response->shouldHaveKey('version');
-        $response->shouldHaveKey('body');
-
-        $response['headers']->shouldBeArray();
-        $response['status']->shouldBe(200);
-        $response['reason']->shouldBeString();
-        $response['version']->shouldEqual("1.1");
-        $response['body']->shouldBeString();
-    }
-
-    function it_should_be_able_to_return_json()
-    {
-        $config = array(
-            'base_uri' => 'http://httpbin.org',
-            'options' => array(
-                'Content-Type' => 'application/json'
-            )
-        );
-        $this->beConstructedWith($config);
-        $response = $this->makeApiCall('/headers', null, null, true);
-        $response['headers']->shouldHaveKey('Content-Type');
-        $response['headers']['Content-Type']->shouldContain('application/json');
-    }
-
-    function it_should_be_able_to_return_xml()
-    {
-        $config = array(
-            'base_uri' => 'http://httpbin.org',
-            'options' => array(
-                'Content-Type' => 'application/xml'
-            )
-        );
-        $this->beConstructedWith($config);
-        $response = $this->makeApiCall('/xml', null, null, true);
-        $response['headers']->shouldHaveKey('Content-Type');
-        $response['headers']['Content-Type']->shouldContain('application/xml');
+        $this->shouldThrow('\Superdesk\ContentApiSdk\Exception\ClientException')->duringMakeCall('some random url that is invalid');
     }
 }

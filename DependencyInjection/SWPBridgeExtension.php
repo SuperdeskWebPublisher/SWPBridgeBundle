@@ -31,16 +31,24 @@ class SWPBridgeExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $defaultOptions = array();
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!empty($config['base_uri'])) {
-            $container->setParameter($this->getAlias().'.base_uri', $config['base_uri']);
+        $mainKeys = array('api', 'auth');
+        foreach ($mainKeys as $mainKey) {
+            if (isset($config[$mainKey])) {
+                foreach ($config[$mainKey] as $key => $value) {
+                    if (!empty($value)) {
+                        $container->setParameter(sprintf('%s.%s.%s', $this->getAlias(), $mainKey, $key), $value);
+                    }
+                }
+            }
         }
-        if (!empty($config['options'])) {
-            $container->setParameter($this->getAlias().'.options', $config['options']);
-        } else {
-            $container->setParameter($this->getAlias().'.options', array());
+
+        if (isset($config['options']) && is_array($config['options'])) {
+            $defaultOptions = $config['options'];
         }
+        $container->setParameter($this->getAlias() . '.options', $defaultOptions);
     }
 }
