@@ -16,8 +16,8 @@ namespace spec\SWP\BridgeBundle\Client;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Superdesk\ContentApiSdk\API\Request;
-use Superdesk\ContentApiSdk\API\Authentication\OAuthPasswordAuthentication;
+use Superdesk\ContentApiSdk\Api\Request;
+use Superdesk\ContentApiSdk\Api\Authentication\OAuthPasswordAuthentication;
 use Superdesk\ContentApiSdk\Client\ClientInterface;
 
 class GuzzleApiClientSpec extends ObjectBehavior

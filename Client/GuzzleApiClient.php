@@ -14,7 +14,7 @@
 
 namespace SWP\BridgeBundle\Client;
 
-use Superdesk\ContentApiSdk\API\Request\RequestInterface;
+use Superdesk\ContentApiSdk\Api\Request\RequestInterface;
 use Superdesk\ContentApiSdk\Client\DefaultApiClient;
 
 /**

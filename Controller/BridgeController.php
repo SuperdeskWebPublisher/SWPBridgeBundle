@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use SWP\BridgeBundle\Client\GuzzleClient;
 use SWP\BridgeBundle\Client\GuzzleApiClient;
 use Superdesk\ContentApiSdk\ContentApiSdk;
-use Superdesk\ContentApiSdk\API\Authentication\OAuthPasswordAuthentication;
-use Superdesk\ContentApiSdk\API\Request\RequestParameters;
+use Superdesk\ContentApiSdk\Api\Authentication\OAuthPasswordAuthentication;
+use Superdesk\ContentApiSdk\Api\Request\RequestParameters;
 use Superdesk\ContentApiSdk\Client\ApiClientInterface;
 use Superdesk\ContentApiSdk\Exception\ContentApiException;
 
