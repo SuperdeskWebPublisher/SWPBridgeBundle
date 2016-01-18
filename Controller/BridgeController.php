@@ -52,7 +52,7 @@ class BridgeController extends Controller
 
         $parameters = $request->query->all();
         $requestParams = new RequestParameters();
-        $requestParams->setQueryParameterArray($requestParams);
+        $requestParams->setQueryParameterArray($parameters);
         $endpointPath = sprintf('/%s', $endpoint);
 
         if ($this->isValidEndpoint($endpointPath)) {
