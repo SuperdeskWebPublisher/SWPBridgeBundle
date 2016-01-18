@@ -21,7 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use SWP\BridgeBundle\Client\GuzzleClient;
 use SWP\BridgeBundle\Client\GuzzleApiClient;
 use Superdesk\ContentApiSdk\ContentApiSdk;
-use Superdesk\ContentApiSdk\API\Authentication\OAuthPasswordAuthentication;
+use Superdesk\ContentApiSdk\Api\Authentication\OAuthPasswordAuthentication;
+use Superdesk\ContentApiSdk\Api\Request\RequestParameters;
 use Superdesk\ContentApiSdk\Client\ApiClientInterface;
 use Superdesk\ContentApiSdk\Exception\ContentApiException;
 
@@ -50,6 +51,8 @@ class BridgeController extends Controller
         $sdk = $this->getSDK($apiClient);
 
         $parameters = $request->query->all();
+        $requestParams = new RequestParameters();
+        $requestParams->setQueryParameterArray($parameters);
         $endpointPath = sprintf('/%s', $endpoint);
 
         if ($this->isValidEndpoint($endpointPath)) {
@@ -62,7 +65,7 @@ class BridgeController extends Controller
                 if (!is_null($objectId)) {
                     $data = $sdk->getItem($objectId);
                 } else {
-                    $data = $sdk->getItems($parameters);
+                    $data = $sdk->getItems($requestParams);
                 }
                 break;
 
@@ -70,12 +73,11 @@ class BridgeController extends Controller
 
                 // TODO: Change this in the future to match the superdesk public api parameter name
                 $resolve = (isset($parameters['resolveItems']) && $parameters['resolveItems']) ? true : false;
-                unset($parameters['resolveItems']);
 
                 if (!is_null($objectId)) {
                     $data = $sdk->getPackage($objectId, $resolve);
                 } else {
-                    $data = $sdk->getPackages($parameters, $resolve);
+                    $data = $sdk->getPackages($requestParams, $resolve);
                 }
                 break;
         }
