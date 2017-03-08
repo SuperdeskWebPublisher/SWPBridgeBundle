@@ -1,19 +1,29 @@
 language: php
 
-matrix:
-    include:
-     - php: 7.0
-     - php: hhvm
-     - php: nightly
-    allow_failures:
-     - php: hhvm
-     - php: nightly
-    fast_finish: true
+php:
+  - 7.0
+  - nightly
 
-before_script:
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+env:
+  - COMPOSER_FLAGS='--prefer-lowest --prefer-stable'
+  - COMPOSER_FLAGS=''
+
+matrix:
+  allow_failures:
+    - php: nightly
+  fast_finish: true
+
+before_install:
   - composer self-update
-  - composer install
+
+install: composer update $COMPOSER_FLAGS --prefer-dist --no-interaction
 
 script:
-  - bin/phpunit --coverage-text
-  - bin/phpspec run --format pretty
+    - bin/phpspec run -fpretty --verbose
+    - bin/phpunit --coverage-text
